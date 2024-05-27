@@ -23,6 +23,7 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { ListaMascotaComponent } from './lista-mascota/lista-mascota.component';
 import { FullCalendarModule } from '@fullcalendar/angular';
 import { EventModalComponent } from './event-modal/event-modal.component';
+import { MatSelectModule } from '@angular/material/select';
 
 @NgModule({
   declarations: [
@@ -52,7 +53,8 @@ import { EventModalComponent } from './event-modal/event-modal.component';
     MatOptionModule,
     MatAutocompleteModule,
     FullCalendarModule,
-    FormsModule
+    FormsModule,
+    MatSelectModule
   ]
 })
 export class IntranetModule {

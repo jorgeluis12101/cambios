@@ -11,11 +11,13 @@
     </mat-form-field>
     <mat-form-field>
       <mat-label>Costo</mat-label>
-      <input matInput formControlName="costo">
+      <input matInput formControlName="costo" type="number">
     </mat-form-field>
     <mat-form-field>
       <mat-label>Tipo de Evento</mat-label>
-      <input matInput formControlName="tipoEvento">
+      <mat-select formControlName="tipoEvento">
+        <mat-option *ngFor="let tipo of tiposEvento" [value]="tipo">{{ tipo }}</mat-option>
+      </mat-select>
     </mat-form-field>
     <div>
       <label>Archivo</label>
@@ -23,7 +25,7 @@
     </div>
     <mat-form-field>
       <mat-label>ID de Mascota</mat-label>
-      <input matInput formControlName="mascotaId">
+      <input matInput formControlName="mascotaId" type="number">
     </mat-form-field>
     <mat-form-field>
       <mat-label>Fecha</mat-label>
@@ -35,3 +37,4 @@
   <button mat-button (click)="onNoClick()">Cancelar</button>
   <button mat-button (click)="onSubmit()" [disabled]="!eventForm.valid">Guardar</button>
 </div>
+

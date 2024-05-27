@@ -55,8 +55,9 @@ export class EventoService {
     return this.http.delete(`${this.apiUrl}/eliminar/${eventoId}`, { headers: this.getAuthHeaders() });
   }
 
+
   actualizarFechaEvento(eventoId: number, nuevaFecha: string): Observable<any> {
-    const datos = { eventoId, nuevaFecha };
-    return this.http.put(`${this.apiUrl}/actualizar-fecha/${eventoId}`, nuevaFecha, { headers: this.getAuthHeaders() });
+    const datos = { fecha: nuevaFecha }; // Enviar un objeto con la clave "fecha"
+    return this.http.put(`${this.apiUrl}/actualizar-fecha/${eventoId}`, datos, { headers: this.getAuthHeaders() });
   }
 }

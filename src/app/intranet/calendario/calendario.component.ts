@@ -7,6 +7,7 @@ import listPlugin from '@fullcalendar/list';
 import { MatDialog } from '@angular/material/dialog';
 import { DatosRegistroEvento, EventoService, Evento } from 'src/app/service/evento.service';
 import { EventModalComponent, EventData } from '../event-modal/event-modal.component';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-calendario',
@@ -54,7 +55,6 @@ export class CalendarioComponent implements OnInit {
   cargarEventos() {
     this.eventoService.obtenerEventos().subscribe(
       (eventos: Evento[]) => {
-        console.log('Eventos obtenidos del backend:', eventos);
         const calendarEvents: EventInput[] = eventos.map(evento => ({
           id: String(evento.id),
           title: `${evento.tipoEvento} - ${evento.veterinaria}`,
@@ -98,7 +98,7 @@ export class CalendarioComponent implements OnInit {
 
   handleDateSelect(selectInfo: DateSelectArg) {
     const dialogRef = this.dialog.open(EventModalComponent, {
-      width: '300px',
+      width: '500px', // Ajusta el ancho del modal aquí
       data: {
         veterinaria: '',
         descripcion: '',
@@ -106,10 +106,10 @@ export class CalendarioComponent implements OnInit {
         tipoEvento: '',
         archivo: null,
         mascotaId: 0,
-        fecha: selectInfo.startStr // Pasar la fecha seleccionada al modal
+        fecha: selectInfo.startStr
       } as EventData
     });
-
+  
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         const newEvent: DatosRegistroEvento = {
@@ -119,13 +119,13 @@ export class CalendarioComponent implements OnInit {
           tipoEvento: result.tipoEvento,
           archivo: result.archivo,
           mascotaId: result.mascotaId,
-          fecha: result.fecha // Asegurarse de incluir la fecha seleccionada
+          fecha: result.fecha
         };
-
+  
         this.eventoService.registrarEvento(newEvent).subscribe(
           () => {
             console.log('Evento registrado con éxito:', newEvent);
-            this.cargarEventos(); // Recargar eventos después de agregar uno nuevo
+            this.cargarEventos();
           },
           (error) => {
             console.error('Error al registrar el evento', error);
@@ -136,17 +136,38 @@ export class CalendarioComponent implements OnInit {
   }
 
   handleEventClick(clickInfo: EventClickArg) {
-    if (confirm(`¿Estás seguro de que quieres eliminar el evento '${clickInfo.event.title}'?`)) {
-      this.eventoService.eliminarEvento(Number(clickInfo.event.id)).subscribe(
-        () => {
-          console.log('Evento eliminado con éxito');
-          clickInfo.event.remove();
-        },
-        (error) => {
-          console.error('Error al eliminar el evento', error);
-        }
-      );
-    }
+    Swal.fire({
+      title: '¿Estás seguro?',
+      text: `¿Estás seguro de que quieres eliminar el evento '${clickInfo.event.title}'?`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.eventoService.eliminarEvento(Number(clickInfo.event.id)).subscribe(
+          () => {
+            console.log('Evento eliminado con éxito');
+            clickInfo.event.remove();
+            Swal.fire(
+              'Eliminado',
+              'El evento ha sido eliminado.',
+              'success'
+            );
+          },
+          (error) => {
+            console.error('Error al eliminar el evento', error);
+            Swal.fire(
+              'Error',
+              'Hubo un problema al eliminar el evento.',
+              'error'
+            );
+          }
+        );
+      }
+    });
   }
 
   handleEvents(events: EventApi[]) {

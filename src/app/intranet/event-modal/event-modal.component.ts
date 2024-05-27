@@ -9,7 +9,7 @@ export interface EventData {
   tipoEvento: string;
   archivo: string | null;
   mascotaId: number;
-  fecha: string; // Agrega la fecha aquí
+  fecha: string;
 }
 
 @Component({
@@ -20,6 +20,7 @@ export interface EventData {
 export class EventModalComponent {
   eventForm: FormGroup;
   selectedFile: File | null = null;
+  tiposEvento = ['DESPARASITACION', 'CITA', 'BAÑO', 'CORTE_DE_PELO', 'PENSION', 'ADOPCION'];
 
   constructor(
     private fb: FormBuilder,
@@ -33,7 +34,7 @@ export class EventModalComponent {
       tipoEvento: ['', Validators.required],
       archivo: [null],
       mascotaId: [data.mascotaId, Validators.required],
-      fecha: [data.fecha, Validators.required] // Asigna la fecha al formulario
+      fecha: [data.fecha, Validators.required]
     });
   }
 
