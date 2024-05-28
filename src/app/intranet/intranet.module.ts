@@ -17,13 +17,17 @@ import { MatNativeDateModule, MatOptionModule } from '@angular/material/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatDialogModule } from '@angular/material/dialog'; // Añadir MatDialogModule aquí
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatExpansionModule } from '@angular/material/expansion';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { ListaMascotaComponent } from './lista-mascota/lista-mascota.component';
 import { FullCalendarModule } from '@fullcalendar/angular';
 import { EventModalComponent } from './event-modal/event-modal.component';
 import { MatSelectModule } from '@angular/material/select';
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatIconModule } from '@angular/material/icon';
 
 @NgModule({
   declarations: [
@@ -48,13 +52,17 @@ import { MatSelectModule } from '@angular/material/select';
     MatButtonModule,
     MatCheckboxModule,
     MatFormFieldModule,
-    MatDialogModule, // Añadir MatDialogModule aquí
+    MatDialogModule,
     ReactiveFormsModule,
     MatOptionModule,
     MatAutocompleteModule,
     FullCalendarModule,
     FormsModule,
-    MatSelectModule
+    MatSelectModule,
+    MatExpansionModule,
+    MatSidenavModule,
+    MatToolbarModule,
+    MatIconModule
   ]
 })
 export class IntranetModule {

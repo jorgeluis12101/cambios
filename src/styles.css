@@ -1,0 +1,9 @@
+::ng-deep .cdk-overlay-backdrop {
+  background: transparent !important;
+  pointer-events: none;
+}
+
+::ng-deep .mat-drawer-backdrop {
+  background: transparent !important;
+  pointer-events: none;
+}

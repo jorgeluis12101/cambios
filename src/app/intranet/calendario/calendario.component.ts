@@ -1,9 +1,10 @@
-import { Component, ChangeDetectorRef, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CalendarOptions, DateSelectArg, EventClickArg, EventApi, EventInput, EventDropArg } from '@fullcalendar/core';
 import interactionPlugin from '@fullcalendar/interaction';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import listPlugin from '@fullcalendar/list';
+import esLocale from '@fullcalendar/core/locales/es';
 import { MatDialog } from '@angular/material/dialog';
 import { DatosRegistroEvento, EventoService, Evento } from 'src/app/service/evento.service';
 import { EventModalComponent, EventData } from '../event-modal/event-modal.component';
@@ -16,6 +17,8 @@ import Swal from 'sweetalert2';
 })
 export class CalendarioComponent implements OnInit {
   calendarVisible = true;
+  isExpanded = false;  // Asegúrate de definir esta propiedad
+
   calendarOptions: CalendarOptions = {
     plugins: [
       interactionPlugin,
@@ -29,6 +32,8 @@ export class CalendarioComponent implements OnInit {
       right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
     },
     initialView: 'dayGridMonth',
+    locales: [esLocale],
+    locale: 'es',
     weekends: true,
     editable: true,
     selectable: true,
@@ -109,7 +114,7 @@ export class CalendarioComponent implements OnInit {
         fecha: selectInfo.startStr
       } as EventData
     });
-  
+
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         const newEvent: DatosRegistroEvento = {
@@ -121,7 +126,7 @@ export class CalendarioComponent implements OnInit {
           mascotaId: result.mascotaId,
           fecha: result.fecha
         };
-  
+
         this.eventoService.registrarEvento(newEvent).subscribe(
           () => {
             console.log('Evento registrado con éxito:', newEvent);
@@ -173,5 +178,9 @@ export class CalendarioComponent implements OnInit {
   handleEvents(events: EventApi[]) {
     this.currentEvents = events;
     this.changeDetector.detectChanges(); // Trabajo en torno a pressionChangedAfterItHasBeenCheckedError
+  }
+
+  toggleSidenav() {
+    this.isExpanded = !this.isExpanded;
   }
 }
