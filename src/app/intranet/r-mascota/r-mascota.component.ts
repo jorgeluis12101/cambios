@@ -1,8 +1,10 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MascotaService } from '../../service/mascota.service';
-import Swal from 'sweetalert2';
 import { RazaService } from '../../service/raza.service';
+import { Observable, of } from 'rxjs';
+import { map, startWith, switchMap, catchError } from 'rxjs/operators';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-r-mascota',
@@ -13,14 +15,14 @@ export class RMascotaComponent {
   @ViewChild('fileInput', { static: false }) fileInput!: ElementRef;
 
   mascotaForm: FormGroup;
-  imageURL?: string; 
-  razas: any[] = [];
+  imageURL?: string;
+  filteredRazas!: Observable<any[]>;
 
   constructor(
     private fb: FormBuilder,
     private mascotaService: MascotaService,
-    private razaService: RazaService) {
-      
+    private razaService: RazaService
+  ) {
     this.mascotaForm = this.fb.group({
       nombreMascota: ['', Validators.required],
       fechaNacimiento: ['', Validators.required],
@@ -33,6 +35,25 @@ export class RMascotaComponent {
     });
   }
 
+  ngOnInit() {
+    this.filteredRazas = this.mascotaForm.get('razaId')!.valueChanges.pipe(
+      startWith(''),
+      switchMap(value => {
+        if (typeof value === 'string' && value.trim().length > 0) {
+          return this.razaService.buscarRazas(value).pipe(
+            catchError(() => of([]))
+          );
+        } else {
+          return of([]);
+        }
+      })
+    );
+  }
+
+  displayRaza(raza: any): string {
+    return raza ? raza.nombre : '';
+  }
+
   onFileSelect(event: Event): void {
     const element = event.target as HTMLInputElement;
     let fileList: FileList | null = element.files;
@@ -40,7 +61,6 @@ export class RMascotaComponent {
       const file = fileList[0];
       this.mascotaForm.get('fotoMascota')!.setValue(file);
 
-      // Leer el archivo seleccionado y generar una URL para visualización
       const reader = new FileReader();
       reader.onload = () => {
         this.imageURL = reader.result as string;
@@ -70,7 +90,7 @@ export class RMascotaComponent {
     formData.append('alimentacion', this.mascotaForm.get('alimentacion')!.value);
     formData.append('color', this.mascotaForm.get('color')!.value);
     formData.append('detalles', this.mascotaForm.get('detalles')!.value);
-    formData.append('razaId', this.mascotaForm.get('razaId')!.value);
+    formData.append('razaId', this.mascotaForm.get('razaId')!.value.id);
     if (this.fileInput.nativeElement.files[0]) {
       formData.append('fotoMascota', this.fileInput.nativeElement.files[0]);
     }
@@ -91,19 +111,5 @@ export class RMascotaComponent {
 
   formatDate(date: Date): string {
     return date.toISOString().split('T')[0]; // Formato 'yyyy-MM-dd'
-  }
-
-  buscarRaza(event: Event): void {
-    const nombre = (event.target as HTMLInputElement).value;
-    if (nombre.length > 2) {  // Evitar búsqueda si el nombre es muy corto
-      this.razaService.buscarRazas(nombre).subscribe({
-        next: (data) => {
-          this.razas = data;
-        },
-        error: () => {
-          this.razas = [];
-        }
-      });
-    }
   }
 }
