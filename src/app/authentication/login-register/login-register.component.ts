@@ -80,4 +80,11 @@ export class LoginRegisterComponent {
       }
     );
   }
+
+  onKeyDown(event: KeyboardEvent) {
+    if (event.key === 'Enter') {
+      this.onLogin();
+    }
+  }
+
 }
