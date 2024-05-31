@@ -90,7 +90,6 @@ export class EventModalComponent {
 
   onSubmit(): void {
     if (this.eventForm.valid) {
-      console.log('Datos del evento enviados:', this.eventForm.value);
       this.dialogRef.close(this.eventForm.value);
     }
   }

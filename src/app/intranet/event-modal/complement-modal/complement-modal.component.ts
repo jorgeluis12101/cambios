@@ -43,7 +43,6 @@ export class ComplementModalComponent {
 
   onSubmit(): void {
     if (this.complementForm.valid) {
-      console.log('Datos del complemento enviados:', this.complementForm.value);
       this.dialogRef.close(this.complementForm.value);
     }
   }

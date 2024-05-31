@@ -67,7 +67,6 @@ export class CalendarioComponent implements OnInit {
           end: evento.fecha,
           allDay: true
         }));
-        console.log('Eventos configurados para el calendario:', calendarEvents);
         this.calendarOptions.events = calendarEvents;
         this.currentEvents = calendarEvents as EventApi[];
         this.changeDetector.detectChanges();
@@ -139,7 +138,6 @@ export class CalendarioComponent implements OnInit {
 
         this.eventoService.registrarEvento(newEvent).subscribe(
           () => {
-            console.log('Evento registrado con éxito:', newEvent);
             this.cargarEventos();
           },
           (error) => {
