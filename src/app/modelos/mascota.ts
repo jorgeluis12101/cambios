@@ -8,6 +8,6 @@ export interface Mascota {
     alimentacion: string;
     color: string;
     detalles: string;
-    raza: Raza; 
-    fotoMascota?: string; 
+    raza: Raza;
+    fotoMascota?: string;
   }

@@ -110,7 +110,8 @@ export class CalendarioComponent implements OnInit {
         costo: '',
         tipoEvento: '',
         archivo: null,
-        mascotaId: 0,
+        nombreMascota: '',
+        tipoMascota: '',
         fecha: selectInfo.startStr
       } as EventData
     });
@@ -123,7 +124,8 @@ export class CalendarioComponent implements OnInit {
           costo: result.costo,
           tipoEvento: result.tipoEvento,
           archivo: result.archivo,
-          mascotaId: result.mascotaId,
+          nombreMascota: result.nombreMascota,
+          tipoMascota: result.tipoMascota,
           fecha: result.fecha
         };
 

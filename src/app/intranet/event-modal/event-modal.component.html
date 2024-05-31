@@ -24,8 +24,12 @@
       <input type="file" (change)="onFileSelected($event)">
     </div>
     <mat-form-field>
-      <mat-label>ID de Mascota</mat-label>
-      <input matInput formControlName="mascotaId" type="number">
+      <mat-label>Nombre de Mascota</mat-label>
+      <input matInput formControlName="nombreMascota">
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>Tipo de Mascota</mat-label>
+      <input matInput formControlName="tipoMascota">
     </mat-form-field>
     <mat-form-field>
       <mat-label>Fecha</mat-label>
@@ -37,4 +41,3 @@
   <button mat-button (click)="onNoClick()">Cancelar</button>
   <button mat-button (click)="onSubmit()" [disabled]="!eventForm.valid">Guardar</button>
 </div>
-

@@ -9,7 +9,8 @@ export interface DatosRegistroEvento {
   costo: string;
   tipoEvento: string;
   archivo: string | null; // Base64 string
-  mascotaId: number;
+  nombreMascota: string;
+  tipoMascota: string;
   fecha: string;
 }
 
@@ -21,7 +22,8 @@ export interface Evento {
   tipoEvento: string;
   archivo: string;
   fecha: string; // La fecha debe estar en formato ISO
-  mascotaId: number;
+  nombreMascota: string;
+  tipoMascota: string;
 }
 
 @Injectable({
@@ -41,12 +43,12 @@ export class EventoService {
   }
 
   registrarEvento(evento: DatosRegistroEvento): Observable<any> {
-    console.log('Registrar Evento - Datos enviados:', evento); // Mensaje de depuración
+    console.log('Registrar Evento - Datos enviados:', evento);
     return this.http.post(`${this.apiUrl}/registrar`, evento, { headers: this.getAuthHeaders() });
   }
 
   obtenerEventos(): Observable<Evento[]> {
-    console.log('Obtener Eventos - Solicitando eventos del usuario...'); // Mensaje de depuración
+    console.log('Obtener Eventos - Solicitando eventos del usuario...');
     return this.http.get<Evento[]>(`${this.apiUrl}/listar`, { headers: this.getAuthHeaders() });
   }
 
@@ -55,9 +57,8 @@ export class EventoService {
     return this.http.delete(`${this.apiUrl}/eliminar/${eventoId}`, { headers: this.getAuthHeaders() });
   }
 
-
   actualizarFechaEvento(eventoId: number, nuevaFecha: string): Observable<any> {
-    const datos = { fecha: nuevaFecha }; // Enviar un objeto con la clave "fecha"
+    const datos = { fecha: nuevaFecha };
     return this.http.put(`${this.apiUrl}/actualizar-fecha/${eventoId}`, datos, { headers: this.getAuthHeaders() });
   }
 }

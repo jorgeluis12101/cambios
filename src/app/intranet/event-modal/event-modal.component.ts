@@ -8,7 +8,8 @@ export interface EventData {
   costo: string;
   tipoEvento: string;
   archivo: string | null;
-  mascotaId: number;
+  nombreMascota: string;
+  tipoMascota: string;
   fecha: string;
 }
 
@@ -33,7 +34,8 @@ export class EventModalComponent {
       costo: ['', Validators.required],
       tipoEvento: ['', Validators.required],
       archivo: [null],
-      mascotaId: [data.mascotaId, Validators.required],
+      nombreMascota: ['', Validators.required],
+      tipoMascota: ['', Validators.required],
       fecha: [data.fecha, Validators.required]
     });
   }
@@ -45,7 +47,7 @@ export class EventModalComponent {
       const reader = new FileReader();
       reader.onload = () => {
         const base64 = reader.result as string;
-        this.eventForm.patchValue({ archivo: base64.split(',')[1] }); // Remove the "data:*/*;base64," part
+        this.eventForm.patchValue({ archivo: base64.split(',')[1] });
       };
       reader.readAsDataURL(this.selectedFile);
     }
