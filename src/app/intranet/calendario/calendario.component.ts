@@ -17,7 +17,7 @@ import Swal from 'sweetalert2';
 })
 export class CalendarioComponent implements OnInit {
   calendarVisible = true;
-  isExpanded = false;  // Asegúrate de definir esta propiedad
+  isExpanded = false;
 
   calendarOptions: CalendarOptions = {
     plugins: [
@@ -43,7 +43,7 @@ export class CalendarioComponent implements OnInit {
     select: this.handleDateSelect.bind(this),
     eventClick: this.handleEventClick.bind(this),
     eventsSet: this.handleEvents.bind(this),
-    eventDrop: this.handleEventDrop.bind(this) // Añadir el manejador de arrastrar y soltar
+    eventDrop: this.handleEventDrop.bind(this)
   };
   currentEvents: EventApi[] = [];
 
@@ -85,7 +85,7 @@ export class CalendarioComponent implements OnInit {
     this.eventoService.actualizarFechaEvento(eventoId, nuevaFecha).subscribe(
       () => {
         console.log('Evento actualizado con éxito');
-        this.cargarEventos(); // Recargar eventos después de mover uno
+        this.cargarEventos();
       },
       (error) => {
         console.error('Error al actualizar la fecha del evento', error);
@@ -103,7 +103,7 @@ export class CalendarioComponent implements OnInit {
 
   handleDateSelect(selectInfo: DateSelectArg) {
     const dialogRef = this.dialog.open(EventModalComponent, {
-      width: '500px', // Ajusta el ancho del modal aquí
+      width: '500px',
       data: {
         veterinaria: '',
         descripcion: '',
@@ -126,7 +126,15 @@ export class CalendarioComponent implements OnInit {
           archivo: result.archivo,
           nombreMascota: result.nombreMascota,
           tipoMascota: result.tipoMascota,
-          fecha: result.fecha
+          fecha: result.fecha,
+          nombreComplemento: result.nombreComplemento,
+          descripcionComplemento: result.descripcionComplemento,
+          tipoComplemento: result.tipoComplemento,
+          fabricante: result.fabricante,
+          lote: result.lote,
+          dosis: result.dosis,
+          frecuencia: result.frecuencia,
+          fechaComplemento: result.fechaComplemento
         };
 
         this.eventoService.registrarEvento(newEvent).subscribe(
@@ -179,7 +187,7 @@ export class CalendarioComponent implements OnInit {
 
   handleEvents(events: EventApi[]) {
     this.currentEvents = events;
-    this.changeDetector.detectChanges(); // Trabajo en torno a pressionChangedAfterItHasBeenCheckedError
+    this.changeDetector.detectChanges();
   }
 
   toggleSidenav() {
