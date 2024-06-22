@@ -5,22 +5,20 @@
 }
 
 .sidenav {
-  width: 300px;
+  width: 250px; /* Adjusted width to make it smaller */
   background-color: #4b99a7;
   color: black;
   position: absolute;
-
 }
 
 .sidenav-content {
-  padding: 20px;
+  padding: 10px; /* Reduced padding */
 }
 
 .main-content {
-  padding: 20px;
+  padding: 10px; /* Reduced padding */
   transition: margin-left 0.3s;
 }
-
 
 mat-toolbar {
   background: #4b99a7;
@@ -31,27 +29,28 @@ mat-toolbar {
 
 h2 {
   margin: 0;
-  font-size: 16px;
-
+  font-size: 14px; /* Reduced font size */
 }
 
 ul {
   margin: 0;
   padding: 0 0 0 1.5em;
-
 }
 
 li {
-  margin: 1.5em 0;
+  margin: 1em 0; /* Reduced margin */
   padding: 0;
-
 }
 
-b { /* used for event dates/times */
-  margin-right: 3px;
-
+b {
+  margin-right: 2px; /* Reduced margin-right */
 }
 
+.demo-app-main {
+  max-width: 80%; /* Constrain the max width of the calendar */
+  margin: 0 auto; /* Center the calendar */
+}
 
-
-
+.full-calendar {
+  max-width: 100%; /* Ensure the calendar uses the available space */
+}

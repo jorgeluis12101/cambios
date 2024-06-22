@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 export interface DatosRegistroEvento {
@@ -7,7 +7,7 @@ export interface DatosRegistroEvento {
   descripcion: string;
   costo: string;
   tipoEvento: string;
-  archivo: string | null;
+  archivo: string;
   nombreMascota: string;
   tipoMascota: string;
   fecha: string;
@@ -18,19 +18,19 @@ export interface DatosRegistroEvento {
   lote?: string;
   dosis?: string;
   frecuencia?: string;
-  fechaComplemento?: string; // Nuevo campo
+  fechaComplemento?: string;
 }
 
-export interface Evento {
-  id: number;
+export interface DatosDetallesEvento {
+  eventoId: string; // Asegúrate de que eventoId está presente
+  fecha: string;
   veterinaria: string;
   descripcion: string;
   costo: string;
   tipoEvento: string;
-  archivo: string | null;
+  archivo: string;
   nombreMascota: string;
-  tipoMascota: string;
-  fecha: string;
+  complemento?: string;
 }
 
 @Injectable({
@@ -41,19 +41,28 @@ export class EventoService {
 
   constructor(private http: HttpClient) {}
 
-  registrarEvento(eventData: DatosRegistroEvento): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/registrar`, eventData);
+  obtenerEventos(nombreMascota: string): Observable<DatosDetallesEvento[]> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    const params = new HttpParams().set('nombreMascota', nombreMascota);
+    return this.http.get<DatosDetallesEvento[]>(`${this.apiUrl}/listar`, { headers, params });
   }
 
-  obtenerEventos(): Observable<Evento[]> {
-    return this.http.get<Evento[]>(`${this.apiUrl}/listar`);
+  registrarEvento(evento: DatosRegistroEvento): Observable<void> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    return this.http.post<void>(`${this.apiUrl}/registrar`, evento, { headers });
   }
 
-  eliminarEvento(eventoId: number): Observable<any> {
-    return this.http.delete<any>(`${this.apiUrl}/eliminar/${eventoId}`);
+  eliminarEvento(eventoId: string): Observable<void> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    return this.http.delete<void>(`${this.apiUrl}/eliminar`, { headers, body: { eventoId } });
   }
 
-  actualizarFechaEvento(eventoId: number, nuevaFecha: string): Observable<any> {
-    return this.http.put<any>(`${this.apiUrl}/actualizar-fecha/${eventoId}`, { fecha: nuevaFecha });
+  actualizarFechaEvento(eventoId: string, nuevaFecha: string): Observable<void> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    return this.http.put<void>(`${this.apiUrl}/actualizar-fecha`, { eventoId, nuevaFecha }, { headers });
   }
 }

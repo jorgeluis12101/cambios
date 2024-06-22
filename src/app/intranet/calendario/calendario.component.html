@@ -20,12 +20,12 @@
             [checked]="calendarOptions.weekends"
             (change)="handleWeekendsToggle()"
           />
-          alternar fines de semana
+          Alternar fines de semana
         </label>
         <h2>Todos los eventos ({{ currentEvents.length }})</h2>
         <ul>
           <li *ngFor="let event of currentEvents">
-            <b>{{ event.startStr }}</b>
+            <b>{{ event['startStr'] }}</b>
             <i>{{ event.title }}</i>
           </li>
         </ul>

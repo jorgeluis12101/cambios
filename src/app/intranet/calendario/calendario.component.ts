@@ -6,9 +6,10 @@ import timeGridPlugin from '@fullcalendar/timegrid';
 import listPlugin from '@fullcalendar/list';
 import esLocale from '@fullcalendar/core/locales/es';
 import { MatDialog } from '@angular/material/dialog';
-import { DatosRegistroEvento, EventoService, Evento } from 'src/app/service/evento.service';
+import { DatosRegistroEvento, EventoService, DatosDetallesEvento } from 'src/app/service/evento.service';
 import { EventModalComponent, EventData } from '../event-modal/event-modal.component';
 import Swal from 'sweetalert2';
+import { jwtDecode } from 'jwt-decode';
 
 @Component({
   selector: 'app-calendario',
@@ -18,6 +19,8 @@ import Swal from 'sweetalert2';
 export class CalendarioComponent implements OnInit {
   calendarVisible = true;
   isExpanded = false;
+  mascotas: string[] = [];
+  currentEvents: EventInput[] = [];
 
   calendarOptions: CalendarOptions = {
     plugins: [
@@ -39,13 +42,14 @@ export class CalendarioComponent implements OnInit {
     selectable: true,
     selectMirror: true,
     dayMaxEvents: true,
-    events: [],
+    events: this.currentEvents,
     select: this.handleDateSelect.bind(this),
     eventClick: this.handleEventClick.bind(this),
     eventsSet: this.handleEvents.bind(this),
-    eventDrop: this.handleEventDrop.bind(this)
+    eventDrop: this.handleEventDrop.bind(this),
+    eventMouseEnter: this.handleEventMouseEnter.bind(this),
+    eventMouseLeave: this.handleEventMouseLeave.bind(this),
   };
-  currentEvents: EventApi[] = [];
 
   constructor(
     private changeDetector: ChangeDetectorRef,
@@ -54,36 +58,76 @@ export class CalendarioComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.cargarEventos();
+    this.getMascotasFromToken();
+  }
+
+  getMascotasFromToken() {
+    const token = localStorage.getItem('token');
+    if (token) {
+      console.log('Token encontrado:', token);
+      const decoded: any = jwtDecode(token);
+      console.log('Token decodificado:', decoded);
+      this.mascotas = decoded.mascotas || [];
+      console.log('Lista de mascotas obtenida del token:', this.mascotas);
+      this.cargarEventos();
+    } else {
+      console.error('No se encontró ningún token en localStorage');
+    }
   }
 
   cargarEventos() {
-    this.eventoService.obtenerEventos().subscribe(
-      (eventos: Evento[]) => {
-        const calendarEvents: EventInput[] = eventos.map(evento => ({
-          id: String(evento.id),
-          title: `${evento.tipoEvento} - ${evento.veterinaria}`,
-          start: evento.fecha,
-          end: evento.fecha,
-          allDay: true
-        }));
-        this.calendarOptions.events = calendarEvents;
-        this.currentEvents = calendarEvents as EventApi[];
-        this.changeDetector.detectChanges();
-      },
-      (error) => {
-        console.error('Error al cargar los eventos', error);
-      }
-    );
+    if (this.mascotas.length === 0) {
+      console.error('No hay mascotas disponibles');
+      return;
+    }
+
+    this.currentEvents = [];
+
+    this.mascotas.forEach((nombreMascota) => {
+      this.eventoService.obtenerEventos(nombreMascota).subscribe(
+        (eventos: DatosDetallesEvento[]) => {
+          const calendarEvents: EventInput[] = eventos.map(evento => ({
+            id: evento.eventoId, // Asegúrate de usar eventoId
+            title: `${evento.tipoEvento} - ${evento.veterinaria} - ${evento.nombreMascota}`,
+            start: evento.fecha,
+            end: evento.fecha,
+            allDay: true,
+            extendedProps: {
+              descripcion: evento.descripcion,
+              costo: evento.costo,
+              archivo: evento.archivo,
+              complemento: evento.complemento
+            }
+          }));
+          this.currentEvents = [...this.currentEvents, ...calendarEvents];
+          this.calendarOptions.events = this.currentEvents;
+          this.changeDetector.detectChanges();
+        },
+        (error) => {
+          console.error('Error al cargar los eventos', error);
+        }
+      );
+    });
   }
 
   handleEventDrop(eventDropInfo: EventDropArg) {
-    const eventoId = Number(eventDropInfo.event.id);
+    const eventoId = eventDropInfo.event.id;
     const nuevaFecha = eventDropInfo.event.startStr;
 
+    if (!eventoId) {
+      console.error('El evento no tiene ID:', eventDropInfo.event);
+      return;
+    }
+
+    console.log(`Actualizando evento con ID ${eventoId} a la nueva fecha ${nuevaFecha}`);
     this.eventoService.actualizarFechaEvento(eventoId, nuevaFecha).subscribe(
       () => {
         console.log('Evento actualizado con éxito');
+        Swal.fire(
+          'Actualizado',
+          'La fecha del evento ha sido actualizada.',
+          'success'
+        );
         this.cargarEventos();
       },
       (error) => {
@@ -94,13 +138,16 @@ export class CalendarioComponent implements OnInit {
 
   handleCalendarToggle() {
     this.calendarVisible = !this.calendarVisible;
+    console.log('Visibilidad del calendario cambiada:', this.calendarVisible);
   }
 
   handleWeekendsToggle() {
     this.calendarOptions.weekends = !this.calendarOptions.weekends;
+    console.log('Visibilidad de los fines de semana cambiada:', this.calendarOptions.weekends);
   }
 
   handleDateSelect(selectInfo: DateSelectArg) {
+    console.log('Fecha seleccionada:', selectInfo.startStr);
     const dialogRef = this.dialog.open(EventModalComponent, {
       width: '500px',
       data: {
@@ -109,7 +156,7 @@ export class CalendarioComponent implements OnInit {
         costo: '',
         tipoEvento: '',
         archivo: null,
-        nombreMascota: '',
+        nombreMascota: '', // Ajustar según sea necesario
         tipoMascota: '',
         fecha: selectInfo.startStr
       } as EventData
@@ -117,6 +164,7 @@ export class CalendarioComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
+        console.log('Datos del nuevo evento:', result);
         const newEvent: DatosRegistroEvento = {
           veterinaria: result.veterinaria,
           descripcion: result.descripcion,
@@ -138,6 +186,12 @@ export class CalendarioComponent implements OnInit {
 
         this.eventoService.registrarEvento(newEvent).subscribe(
           () => {
+            console.log('Evento registrado con éxito');
+            Swal.fire(
+              'Registrado',
+              'El evento ha sido registrado con éxito.',
+              'success'
+            );
             this.cargarEventos();
           },
           (error) => {
@@ -149,6 +203,8 @@ export class CalendarioComponent implements OnInit {
   }
 
   handleEventClick(clickInfo: EventClickArg) {
+    const evento = clickInfo.event.extendedProps as DatosDetallesEvento;
+
     Swal.fire({
       title: '¿Estás seguro?',
       text: `¿Estás seguro de que quieres eliminar el evento '${clickInfo.event.title}'?`,
@@ -160,7 +216,8 @@ export class CalendarioComponent implements OnInit {
       cancelButtonText: 'Cancelar'
     }).then((result) => {
       if (result.isConfirmed) {
-        this.eventoService.eliminarEvento(Number(clickInfo.event.id)).subscribe(
+        console.log(`Eliminando evento con ID ${clickInfo.event.id}`);
+        this.eventoService.eliminarEvento(clickInfo.event.id as string).subscribe(
           () => {
             console.log('Evento eliminado con éxito');
             clickInfo.event.remove();
@@ -184,11 +241,21 @@ export class CalendarioComponent implements OnInit {
   }
 
   handleEvents(events: EventApi[]) {
-    this.currentEvents = events;
+    this.currentEvents = events as EventInput[];
+    console.log('Eventos actuales:', this.currentEvents);
     this.changeDetector.detectChanges();
+  }
+
+  handleEventMouseEnter(mouseEnterInfo: any) {
+    mouseEnterInfo.el.style.cursor = 'pointer';
+  }
+
+  handleEventMouseLeave(mouseLeaveInfo: any) {
+    mouseLeaveInfo.el.style.cursor = '';
   }
 
   toggleSidenav() {
     this.isExpanded = !this.isExpanded;
+    console.log('Estado del sidenav cambiado:', this.isExpanded);
   }
 }
