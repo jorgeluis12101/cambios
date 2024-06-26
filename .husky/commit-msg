@@ -1,0 +1,10 @@
+#!/bin/sh
+
+commit_message=$(cat "$1")
+
+patter="^JIRA-[0-9]+ .+$"
+
+if ! echo "$commit_message" | grep -qE "$pattern"; then
+    echo "Error: El commit debe seguir el patron 'JIRA-XXX mensaje'"
+    exit 1
+fi
