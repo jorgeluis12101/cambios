@@ -7,3 +7,13 @@
     background-image: url('https://via.placeholder.com/50');
     background-size: cover;
   }
+
+  .estado-general-img {
+    width: 150px; 
+    height: 150px; 
+    border-radius: 50%;
+    object-fit: cover;
+    margin: 0 auto;
+    display: block;
+  }
+  

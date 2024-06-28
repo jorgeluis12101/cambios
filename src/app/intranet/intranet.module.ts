@@ -29,6 +29,7 @@ import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
 import { ComplementModalComponent } from './event-modal/complement-modal/complement-modal.component';
+import { EditarMascotaComponent } from './editar-mascota/editar-mascota.component';
 
 @NgModule({
   declarations: [
@@ -40,7 +41,8 @@ import { ComplementModalComponent } from './event-modal/complement-modal/complem
     RMascotaComponent,
     ListaMascotaComponent,
     EventModalComponent,
-    ComplementModalComponent
+    ComplementModalComponent,
+    EditarMascotaComponent
   ],
   imports: [
     CommonModule,

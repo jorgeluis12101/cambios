@@ -1,49 +1,57 @@
 <div class="container mt-4">
-    <h2 class="mb-3 text-center">Lista de Mascotas ({{ cantidadMascotas }}/10)</h2>
-  
-    <ng-container *ngIf="cantidadMascotas === 0; else mascotasList">
-      <div class="alert alert-warning text-center" role="alert">
-        Parece que no tienes mascotas registradas aún, presiona aquí para que agregues a tu amigo.
-      </div>
-      <div class="text-center mb-5">
+  <h2 class="mb-3 text-center">Lista de Mascotas ({{ cantidadMascotas }}/10)</h2>
+  <div class="text-center">
+    <ng-container [ngSwitch]="estadoGeneral">
+      <img *ngSwitchCase="'Feliz'" src="../../../assets/perritofeli.webp" alt="Estado Feliz" class="estado-general-img">
+      <img *ngSwitchCase="'Neutral'" src="../../../assets/PerroNeutral.jpg" alt="Estado Neutral" class="estado-general-img">
+      <img *ngSwitchCase="'Triste'" src="../../../assets/perroTriste.jpg" alt="Estado Triste" class="estado-general-img">
+    </ng-container>
+  </div>
+  <h3 class="mb-3 text-center">Estado General: {{ estadoGeneral }}</h3>
+
+  <ng-container *ngIf="cantidadMascotas === 0; else mascotasList">
+    <div class="alert alert-warning text-center" role="alert">
+      Parece que no tienes mascotas registradas aún, presiona aquí para que agregues a tu amigo.
+    </div>
+    <div class="text-center mb-5">
+      <button mat-raised-button color="primary" (click)="agregarMascota()">Agregar Mascota</button>
+    </div>
+  </ng-container>
+
+  <ng-template #mascotasList>
+    <div class="row mb-3">
+      <div class="col text-right">
         <button mat-raised-button color="primary" (click)="agregarMascota()">Agregar Mascota</button>
       </div>
-    </ng-container>
-  
-    <ng-template #mascotasList>
-      <div class="row mb-3">
-        <div class="col text-right">
-          <button mat-raised-button color="primary" (click)="agregarMascota()">Agregar Mascota</button>
+    </div>
+    <div class="row">
+      <ng-container *ngIf="mascotas && mascotas.length > 0; else noData">
+        <div class="col-md-4 mb-4" *ngFor="let mascota of mascotas; let i = index">
+          <mat-card class="example-card">
+            <mat-card-header>
+              <div mat-card-avatar class="example-header-image"></div>
+              <mat-card-title>{{ mascota.nombreMascota }}</mat-card-title>
+              <mat-card-subtitle>{{ estadosMascotas[mascota.nombreMascota] }} - {{ eventosMascotas[mascota.nombreMascota] }} eventos</mat-card-subtitle>
+            </mat-card-header>
+            <img *ngIf="mascota.fotoMascota" [src]="'data:image/jpeg;base64,' + mascota.fotoMascota" alt="Foto de {{ mascota.nombreMascota }}" class="card-img-top">
+            <mat-card-content>
+              <p>Fecha de Nacimiento: {{ mascota.fechaNacimiento | date: 'mediumDate' }}</p>
+              <p>Peso: {{ mascota.peso }} kg</p>
+              <p>Alimentación: {{ mascota.alimentacion }}</p>
+              <p>Color: {{ mascota.color }}</p>
+              <p>Detalles: {{ mascota.detalles }}</p>
+              <p>Raza: {{ mascota.raza }}</p>
+            </mat-card-content>
+           
+          </mat-card>
         </div>
-      </div>
-      <div class="row">
-        <ng-container *ngIf="mascotas && mascotas.length > 0; else noData">
-          <div class="col-md-4 mb-4" *ngFor="let mascota of mascotas; let i = index">
-            <mat-card class="example-card">
-              <mat-card-header>
-                <div mat-card-avatar class="example-header-image"></div>
-                <mat-card-title>{{ mascota.nombreMascota }}</mat-card-title>
-                <mat-card-subtitle>{{ mascota.raza }}</mat-card-subtitle>
-              </mat-card-header>
-              <img *ngIf="mascota.fotoMascota" [src]="'data:image/jpeg;base64,' + mascota.fotoMascota" alt="Foto de {{ mascota.nombreMascota }}" class="card-img-top">
-              <mat-card-content>
-                <p>Fecha de Nacimiento: {{ mascota.fechaNacimiento | date: 'mediumDate' }}</p>
-                <p>Peso: {{ mascota.peso }} kg</p>
-                <p>Alimentación: {{ mascota.alimentacion }}</p>
-                <p>Color: {{ mascota.color }}</p>
-                <p>Detalles: {{ mascota.detalles }}</p>
-                <p>Raza: {{ mascota.raza }}</p>
-              </mat-card-content>
-            </mat-card>
-          </div>
-        </ng-container>
-      </div>
-    </ng-template>
-  
-    <ng-template #noData>
-      <div class="alert alert-warning" role="alert">
-        No hay mascotas registradas.
-      </div>
-    </ng-template>
-  </div>
-  
+      </ng-container>
+    </div>
+  </ng-template>
+
+  <ng-template #noData>
+    <div class="alert alert-warning" role="alert">
+      No hay mascotas registradas.
+    </div>
+  </ng-template>
+</div>

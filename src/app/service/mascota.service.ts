@@ -29,4 +29,17 @@ export class MascotaService {
     });
     return this.http.get<Mascota[]>(`${baserUrl}/api/v1/mascota/listar`, { headers });
   }
+
+  modificarMascota(mascotaId: number, data: FormData): Observable<Mascota> {
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${localStorage.getItem('token')}`
+    });
+    return this.http.put<Mascota>(`${this.apiUrl}/modificar/${mascotaId}`, data, { headers })
+      .pipe(
+        catchError(error => {
+          console.error('Error al modificar mascota:', error.error);
+          return throwError(() => new Error('Algo salió mal; por favor intenta nuevamente más tarde.'));
+        })
+      );
+  }
 }

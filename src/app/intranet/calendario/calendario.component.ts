@@ -1,4 +1,5 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import {jwtDecode} from 'jwt-decode';
 import { CalendarOptions, DateSelectArg, EventClickArg, EventApi, EventInput, EventDropArg } from '@fullcalendar/core';
 import interactionPlugin from '@fullcalendar/interaction';
 import dayGridPlugin from '@fullcalendar/daygrid';
@@ -9,7 +10,6 @@ import { MatDialog } from '@angular/material/dialog';
 import { DatosRegistroEvento, EventoService, DatosDetallesEvento } from 'src/app/service/evento.service';
 import { EventModalComponent, EventData } from '../event-modal/event-modal.component';
 import Swal from 'sweetalert2';
-import { jwtDecode } from 'jwt-decode';
 
 @Component({
   selector: 'app-calendario',
@@ -21,6 +21,7 @@ export class CalendarioComponent implements OnInit {
   isExpanded = false;
   mascotas: string[] = [];
   currentEvents: EventInput[] = [];
+  estadosMascotas: { [nombreMascota: string]: string } = {};
 
   calendarOptions: CalendarOptions = {
     plugins: [
@@ -67,7 +68,15 @@ export class CalendarioComponent implements OnInit {
       console.log('Token encontrado:', token);
       const decoded: any = jwtDecode(token);
       console.log('Token decodificado:', decoded);
-      this.mascotas = decoded.mascotas || [];
+
+      // Verificar si la propiedad mascotas existe y es un array
+      if (decoded.mascotas && Array.isArray(decoded.mascotas)) {
+        this.mascotas = decoded.mascotas;
+      } else {
+        console.error('La propiedad mascotas no existe o no es un array en el token decodificado');
+        this.mascotas = [];
+      }
+
       console.log('Lista de mascotas obtenida del token:', this.mascotas);
       this.cargarEventos();
     } else {
@@ -101,6 +110,7 @@ export class CalendarioComponent implements OnInit {
           }));
           this.currentEvents = [...this.currentEvents, ...calendarEvents];
           this.calendarOptions.events = this.currentEvents;
+          this.establecerEstadoMascotas(nombreMascota, eventos.length);
           this.changeDetector.detectChanges();
         },
         (error) => {
@@ -108,6 +118,16 @@ export class CalendarioComponent implements OnInit {
         }
       );
     });
+  }
+
+  establecerEstadoMascotas(nombreMascota: string, numeroEventos: number) {
+    if (numeroEventos >= 10) {
+      this.estadosMascotas[nombreMascota] = 'Feliz';
+    } else if (numeroEventos >= 5) {
+      this.estadosMascotas[nombreMascota] = 'Contento';
+    } else {
+      this.estadosMascotas[nombreMascota] = 'Neutral';
+    }
   }
 
   handleEventDrop(eventDropInfo: EventDropArg) {
@@ -226,6 +246,7 @@ export class CalendarioComponent implements OnInit {
               'El evento ha sido eliminado.',
               'success'
             );
+            this.cargarEventos();
           },
           (error) => {
             console.error('Error al eliminar el evento', error);
@@ -243,7 +264,40 @@ export class CalendarioComponent implements OnInit {
   handleEvents(events: EventApi[]) {
     this.currentEvents = events as EventInput[];
     console.log('Eventos actuales:', this.currentEvents);
+    this.establecerEstadosMascotasRealTime();
     this.changeDetector.detectChanges();
+  }
+
+  establecerEstadosMascotasRealTime() {
+    const eventosPorMascota: { [nombreMascota: string]: number } = {};
+  
+    this.currentEvents.forEach(evento => {
+      if (evento.title) { // Verificación de que evento.title no es undefined
+        const nombreMascota = evento.title.split(' - ')[2];
+        if (eventosPorMascota[nombreMascota]) {
+          eventosPorMascota[nombreMascota]++;
+        } else {
+          eventosPorMascota[nombreMascota] = 1;
+        }
+      } else {
+        console.error('El evento no tiene un título definido:', evento);
+      }
+    });
+  
+    Object.keys(eventosPorMascota).forEach(nombreMascota => {
+      const numeroEventos = eventosPorMascota[nombreMascota];
+      this.estadosMascotas[nombreMascota] = this.obtenerEstadoMascota(numeroEventos);
+    });
+  }
+
+  obtenerEstadoMascota(numeroEventos: number): string {
+    if (numeroEventos >= 10) {
+      return 'Feliz';
+    } else if (numeroEventos >= 5) {
+      return 'Neutral';
+    } else {
+      return 'Triste';
+    }
   }
 
   handleEventMouseEnter(mouseEnterInfo: any) {
